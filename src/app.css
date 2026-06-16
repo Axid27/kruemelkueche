@@ -1,0 +1,29 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --color-bg:            #FFFAF3;
+  --color-surface:       #FFF5E4;
+  --color-primary:       #C4622D;
+  --color-primary-light: #E8845A;
+  --color-accent:        #F2C94C;
+  --color-text:          #2C1A0E;
+  --color-subtle:        #8C6B4A;
+  --color-border:        #E8D5B7;
+  --font-display:        'Playfair Display', Georgia, serif;
+  --font-body:           'Nunito', Arial, sans-serif;
+  --radius-sm:           8px;
+  --radius-md:           16px;
+  --radius-lg:           24px;
+  --shadow-soft:         0 4px 24px rgba(44, 26, 14, 0.08);
+  --max-width:           480px;
+}
+
+html, body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  overflow-x: hidden;
+}
