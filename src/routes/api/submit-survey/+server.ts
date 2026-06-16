@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import type { Database } from '$lib/types/database.types';
+import ws from 'ws';
 import {
 	grasslScale,
 	manipulationAwareness,
@@ -14,7 +15,9 @@ import {
 	type LikertValue
 } from '$lib/questionnaire';
 
-const adminClient = createClient<Database>(PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+const adminClient = createClient<Database>(PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+	realtime: { transport: ws }
+});
 
 export async function POST({ request }) {
 	const { participantId, responses, demographics } = await request.json();
