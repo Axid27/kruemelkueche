@@ -42,6 +42,9 @@ export async function POST({ request }) {
 	const iuipcCollectionMean = computeScore(iuipcCollection, r);
 	const iuipcTotalMean = computeIuipcTotal(r, r, r);
 
+	// Attention Check: korrekte Antwort = 7 ("Stimme voll und ganz zu")
+	const attentionPassed = r['ATT1'] === 7;
+
 	// Scores + Demographics in DB
 	const { error: scoreError } = await adminClient.from('scale_scores').insert({
 		participant_id: participantId,
@@ -51,6 +54,7 @@ export async function POST({ request }) {
 		iuipc_awareness_mean: iuipcAwarenessMean,
 		iuipc_collection_mean: iuipcCollectionMean,
 		iuipc_total_mean: iuipcTotalMean,
+		attention_check_passed: attentionPassed,
 		age: demographics.age ? Number(demographics.age) : null,
 		gender: demographics.gender ?? null,
 		education: demographics.education ?? null,
@@ -73,5 +77,6 @@ function getScaleId(key: string): string {
 	if (key.startsWith('MA')) return 'bongard';
 	if (key.startsWith('IC')) return 'iuipc';
 	if (key.startsWith('IA')) return 'iuipc';
+	if (key.startsWith('ATT')) return 'attention';
 	return 'demographics';
 }

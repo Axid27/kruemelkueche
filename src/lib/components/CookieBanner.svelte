@@ -9,17 +9,36 @@
 	}: { onDecision: (choice: 'accept' | 'granular' | 'decline') => void } = $props();
 
 	let choice = $state<'accept' | 'granular' | 'decline' | null>(null);
-	let pulseActive = $state(false);
 
 	let animationContainer: HTMLDivElement;
 	let anim: AnimationItem | null = null;
 	let condition: 1 | 2 | 3 = 1;
-	let pulseInterval: ReturnType<typeof setInterval> | null = null;
 
-	const frames = {
-		accept:   { start: 0,  end: 10 },
-		granular: { start: 11, end: 21 },
-		decline:  { start: 22, end: 54 }
+	const animationFile: Record<1 | 2 | 3, string> = {
+		1: '/Cookie-NoFacial.json',
+		2: '/Cookie-NoFacial.json',
+		3: '/Cookie-Facial.json'
+	};
+
+	const frames: Record<
+		1 | 2 | 3,
+		Record<'accept' | 'granular' | 'decline', { start: number; end: number }>
+	> = {
+		1: {
+			accept:   { start: 0,   end: 57  },
+			granular: { start: 0,   end: 57  },
+			decline:  { start: 0,   end: 57  }
+		},
+		2: {
+			accept:   { start: 0,   end: 57  },
+			granular: { start: 58,  end: 119 },
+			decline:  { start: 120, end: 220 }
+		},
+		3: {
+			accept:   { start: 0,   end: 57  },
+			granular: { start: 58,  end: 119 },
+			decline:  { start: 120, end: 220 }
+		}
 	};
 
 	const unsubscribe = session.subscribe((s) => {
@@ -27,7 +46,8 @@
 	});
 
 	onMount(async () => {
-		const animData = await fetch('/Cookie.json').then((r) => r.json());
+		const file = animationFile[condition];
+		const animData = await fetch(file).then((r) => r.json());
 
 		anim = lottie.loadAnimation({
 			container: animationContainer,
@@ -39,41 +59,23 @@
 
 		anim.goToAndStop(0, true);
 
-		if (condition === 1) {
-			startPulse();
-		}
-
 		logger.bannerShown();
 	});
 
 	onDestroy(() => {
 		anim?.destroy();
-		if (pulseInterval) clearInterval(pulseInterval);
 		unsubscribe();
 	});
-
-	function startPulse() {
-		pulseInterval = setInterval(() => {
-			pulseActive = true;
-			setTimeout(() => {
-				pulseActive = false;
-			}, 600);
-		}, 2000);
-	}
 
 	function selectChoice(c: 'accept' | 'granular' | 'decline') {
 		logger.optionTapped(c);
 		choice = c;
 
-		if (condition === 1) {
-			pulseActive = true;
-			setTimeout(() => {
-				pulseActive = false;
-			}, 400);
-			return;
-		}
+		const range = frames[condition][c];
 
-		const range = frames[c];
+		if (condition === 1) {
+			anim?.goToAndStop(0, true);
+		}
 		anim?.playSegments([range.start, range.end], true);
 	}
 
@@ -92,7 +94,7 @@
 		<div class="handle"></div>
 
 		<!-- Animation -->
-		<div class="lottie-wrap" class:pulse={pulseActive}>
+		<div class="lottie-wrap">
 			<div bind:this={animationContainer} class="lottie-container"></div>
 		</div>
 
@@ -112,7 +114,6 @@
 				onclick={() => selectChoice('accept')}
 				aria-pressed={choice === 'accept'}
 			>
-				<span class="tab-icon">✅</span>
 				<span class="tab-label">Alle akzeptieren</span>
 			</button>
 
@@ -122,8 +123,7 @@
 				onclick={() => selectChoice('granular')}
 				aria-pressed={choice === 'granular'}
 			>
-				<span class="tab-icon">⚙️</span>
-				<span class="tab-label">Auswahl treffen</span>
+				<span class="tab-label">Nur notwendige</span>
 			</button>
 
 			<button
@@ -132,7 +132,6 @@
 				onclick={() => selectChoice('decline')}
 				aria-pressed={choice === 'decline'}
 			>
-				<span class="tab-icon">❌</span>
 				<span class="tab-label">Ablehnen</span>
 			</button>
 		</div>
@@ -178,7 +177,7 @@
 		margin: 0 auto;
 		background: var(--color-bg);
 		border-radius: 24px 24px 0 0;
-		padding: 12px 20px 36px;
+		padding: 12px 20px calc(36px + env(safe-area-inset-bottom, 0px));
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -202,21 +201,14 @@
 
 	/* ── Lottie ── */
 	.lottie-wrap {
-		width: 160px;
-		height: 160px;
-	}
-	.lottie-wrap.pulse {
-		animation: pulse 0.6s ease;
-	}
-	@keyframes pulse {
-		0%   { transform: scale(1); }
-		40%  { transform: scale(1.08); }
-		70%  { transform: scale(0.97); }
-		100% { transform: scale(1); }
+		width: 220px;
+		height: 220px;
+		margin: 8px 0;
 	}
 	.lottie-container {
 		width: 100%;
 		height: 100%;
+		will-change: transform;
 	}
 
 	/* ── Text ── */
@@ -242,9 +234,8 @@
 	}
 	.tab {
 		display: flex;
-		flex-direction: column;
 		align-items: center;
-		gap: 4px;
+		justify-content: center;
 		padding: 10px 6px;
 		border-radius: var(--radius-sm);
 		border: 2px solid var(--color-border);
@@ -258,7 +249,6 @@
 		border-color: var(--color-primary);
 		background: rgba(196, 98, 45, 0.08);
 	}
-	.tab-icon { font-size: 20px; }
 	.tab-label {
 		font-size: 11px;
 		font-weight: 600;

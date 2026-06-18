@@ -1,6 +1,10 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* iOS auto-zoom prevention: inputs must be ≥ 16px */
+input, select, textarea, button { font-size: 16px; }
+
 :root {
+  --vh: 1vh; /* overridden by JS to fix iOS Safari 100vh bug */
   --color-bg:            #FFFAF3;
   --color-surface:       #FFF5E4;
   --color-primary:       #C4622D;
@@ -23,6 +27,7 @@ html, body {
   color: var(--color-text);
   font-family: var(--font-body);
   min-height: 100vh;
+  min-height: calc(var(--vh, 1vh) * 100);
   max-width: var(--max-width);
   margin: 0 auto;
   overflow-x: hidden;

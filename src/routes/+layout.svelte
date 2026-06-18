@@ -1,8 +1,18 @@
 <script lang="ts">
 	import '../app.css';
+	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 
 	let { children }: { children: Snippet } = $props();
+
+	onMount(() => {
+		function setVH() {
+			document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+		}
+		setVH();
+		window.addEventListener('resize', setVH);
+		return () => window.removeEventListener('resize', setVH);
+	});
 </script>
 
 <svelte:head>

@@ -58,6 +58,8 @@
 	}
 	.likert-btn {
 		aspect-ratio: 1;
+		min-width: 40px;
+		min-height: 40px;
 		border-radius: 6px;
 		border: 1.5px solid var(--study-border);
 		background: var(--study-surface);
@@ -70,6 +72,13 @@
 		align-items: center;
 		justify-content: center;
 		font-family: var(--study-font);
+	}
+
+	/* iPhone SE (375px) and narrower: wrap to two rows of 4+3 */
+	@media (max-width: 360px) {
+		.likert-row {
+			grid-template-columns: repeat(4, 1fr);
+		}
 	}
 	.likert-btn:active {
 		transform: scale(0.93);

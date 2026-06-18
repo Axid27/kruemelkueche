@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '$lib/styles/study.css';
-	import { goto } from '$app/navigation';
+	import { goto, beforeNavigate } from '$app/navigation';
 	import LikertScale from '$lib/components/LikertScale.svelte';
 	import {
 		grasslScale,
@@ -8,7 +8,8 @@
 		iuipcControl,
 		iuipcAwareness,
 		iuipcCollection,
-		demographicsQuestions
+		demographicsQuestions,
+		attentionCheckItem
 	} from '$lib/questionnaire';
 
 	const steps = [
@@ -36,7 +37,11 @@
 	let currentStepComplete = $derived.by(() => {
 		const step = steps[currentStep];
 		if (step.type === 'likert' && step.scale) {
-			return step.scale.items.every((item) => responses[item.key] !== undefined);
+			const scaleComplete = step.scale.items.every((item) => responses[item.key] !== undefined);
+			if (step.id === 'bongard') {
+				return scaleComplete && responses[attentionCheckItem.key] !== undefined;
+			}
+			return scaleComplete;
 		}
 		if (step.type === 'iuipc') {
 			return [
@@ -54,6 +59,15 @@
 			);
 		}
 		return false;
+	});
+
+	beforeNavigate(({ cancel, type }) => {
+		if (type === 'popstate' && currentStep < steps.length - 1) {
+			const confirmLeave = confirm(
+				'Möchtest du die Studie wirklich verlassen? Dein Fortschritt geht verloren.'
+			);
+			if (!confirmLeave) cancel();
+		}
 	});
 
 	function handleLikert(key: string, val: number) {
@@ -155,6 +169,15 @@
 						onChange={handleLikert}
 					/>
 				{/each}
+				{#if steps[currentStep].id === 'bongard'}
+					<LikertScale
+						item={attentionCheckItem}
+						value={responses[attentionCheckItem.key] ?? null}
+						anchorLow={scale.anchorLow}
+						anchorHigh={scale.anchorHigh}
+						onChange={handleLikert}
+					/>
+				{/if}
 			</div>
 		{/if}
 	{/if}

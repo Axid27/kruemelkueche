@@ -25,10 +25,9 @@
 		const condition = Number(sessionStorage.getItem('condition')) as 1 | 2 | 3;
 		session.set({ participantId: pid, condition });
 
-		const showNow = params.get('showBanner') === 'true';
 		setTimeout(() => {
 			bannerVisible = true;
-		}, showNow ? 0 : 1500);
+		}, 1500);
 	});
 </script>
 
