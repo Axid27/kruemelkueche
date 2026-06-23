@@ -31,7 +31,11 @@ export async function POST({ request }) {
 	}));
 
 	const { error: itemError } = await adminClient.from('survey_responses').insert(items);
-	if (itemError) return json({ error: itemError.message }, { status: 500 });
+	if (itemError) {
+		console.error('survey_responses insert failed:', JSON.stringify(itemError, null, 2));
+		console.error('items attempted:', JSON.stringify(items, null, 2));
+		return json({ error: itemError.message }, { status: 500 });
+	}
 
 	// Scores berechnen
 	const r = responses as Record<string, LikertValue>;
