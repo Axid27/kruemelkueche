@@ -1,6 +1,6 @@
 # Krümelküche – Cookie-Consent-Studie
 
-Studienprototyp zur Masterarbeit von Pit Kaldewey (TH Köln, Master Interaction Design / HCI).
+Studienprototyp zur Masterarbeit von Pit Kaldewey (TH Köln, Master Medieninformatik).
 Die fiktive Backrezepte-Website „Krümelküche“ dient als Stimulus für ein mobiles Online-Experiment zur Frage, wie animierte Konsequenzvisualisierung an Cookie-Bannern Entscheidungsverhalten, Interaktionsdauer und wahrgenommene Kontrolle beeinflusst.
 
 **Live:** https://kruemelkueche.vercel.app
